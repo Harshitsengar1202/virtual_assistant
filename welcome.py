@@ -33,6 +33,7 @@ def search(command):
     return driver
 
 def wiki(command):
+    print(wikipedia.search(command))
     result=wikipedia.summary(command)
     result2=wikipedia.summary(command,sentences=2)
     print(result)
