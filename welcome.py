@@ -15,6 +15,9 @@ import tkinter as tk
 #from PIL import Image, ImageTk
 from itertools import count
 import time
+import sys
+print(sys.executable)
+print(sys.path)
 
 def SpeakText(command):
     engine = pyttsx3.init()
