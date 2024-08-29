@@ -1,4 +1,4 @@
-from tkinter import *
+import tkinter as tk
 from gtts import gTTS
 from playsound import playsound
 import os
@@ -9,14 +9,13 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 import pyttsx3
 import wikipedia
-#import webbrowser as web
 from selenium import webdriver
 import googlesearch
-import tkinter as tk
 from PIL import Image, ImageTk
 from itertools import count
 import time
 import pyautogui
+import winapps
 
 def SpeakText(command):
     engine = pyttsx3.init()
@@ -27,20 +26,11 @@ def SpeakText(command):
 
 def search(command):
     search_string = command
-    #search_string = search_string.replace(' ', '+')
     s=Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=s)
     driver.maximize_window()
-    driver.get("https://www.google.com/search?q=" +search_string + "&start=" + str(0))
+    driver.get("https://www.google.com/search?q=" + search_string + "&start=" + str(0))
     return driver
-    #driver.find_element(By.NAME, 'q').send_keys(search_string)
-    '''browser = webdriver.Chrome('D:\\chromedriver.exe')
-    for i in range(1):
-        matched_elements = browser.get("https://www.google.com/search?q=" +search_string + "&start=" + str(i))'''
-    '''path = "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe %s"
-    web.get(path).open(command)'''
-    #for j in googlesearch.search(command, tld="com", num=10, stop=10, pause=2):
-        #print(j)
 
 def wiki(command):
     result=wikipedia.summary(command)
@@ -48,58 +38,6 @@ def wiki(command):
     print(result)
     SpeakText(result2)
 
-'''    
-class ImageLabel(tk.Label):
-    """a label that displays images, and plays them if they are gifs"""
-    def load(self, im):
-        if isinstance(im, str):
-            im = Image.open(im)
-        self.loc = 0
-        self.frames = []
-
-        try:
-            for i in count(1):
-                self.frames.append(ImageTk.PhotoImage(im.copy()))
-                im.seek(i)
-        except EOFError:
-            pass
-
-        try:
-            self.delay = im.info['duration']
-        except:
-            self.delay = 100
-
-        if len(self.frames) == 1:
-            self.config(image=self.frames[0])
-        else:
-            self.next_frame()
-
-    def unload(self):
-        self.config(image="")
-        self.frames = None
-
-    def next_frame(self):
-        if self.frames:
-            self.loc += 1
-            self.loc %= len(self.frames)
-            self.config(image=self.frames[self.loc])
-            self.after(self.delay, self.next_frame)
-
-
-
-def animation():
-    root = tk.Tk()
-    lbl = ImageLabel(root)
-    lbl.pack()
-    lbl.load('myai.gif')
-    b1=Button(root,text="Listen",command=process,height=30,width=80)
-    b1.pack()
-    logo=PhotoImage(file='mic.png')
-    b1.config(image=logo,compound=LEFT)
-    small_logo=logo.subsample(10,10)
-    b1.config(image=small_logo)
-    root.mainloop()
-'''
 def process():
     global MyText
     n=1
@@ -117,19 +55,16 @@ def process():
         except sr.UnknownValueError:
             print("unknown error occured")
 
-def find_files(filename, search_path):
-   result = []
-   for root, dir, files in os.walk(search_path):
-      if filename in files:
-         result.append(os.path.join(root, filename))
-   print(result)
-   return result
+def find_app(name):
+    for item in winapps.search_installed(name):
+        if hasattr(item, 'install_location'):
+            return str(item.install_location)
+    return None
 
 MyText=None
 mytext='Hello Harshit How can I help you'
 r = sr.Recognizer()
 SpeakText(mytext)
-#animation()
 MyText=process()
 if 'wikipedia' in MyText:
     print("Results for "+MyText)
@@ -137,15 +72,23 @@ if 'wikipedia' in MyText:
 elif 'bye' in MyText:
     exit()
 elif 'open' in MyText:
-    #SpeakText('Tumhari maa ka bhosda')
+    print(MyText)
     temp=MyText.split()
     x=temp[1]
-    #print("maa chuda")
-    path=find_files(x+'.exe',"E:\\")
-    pyautogui.moveTo(path[0])
-    #os.system("cd"+path[0])
-    #time.sleep(3)
-    #subprocess.Popen(path[0])
+    app_path=find_app(x)
+    if app_path:
+        try:
+            # Run the executable at the specified path
+            executable_path = os.path.join(app_path, x + '.exe')
+            if os.path.exists(executable_path):
+                subprocess.Popen(executable_path)
+                print(f"Running {x} at path: {executable_path}")
+            else:
+                print(f"Could not find the executable {x}.exe at path: {app_path}")
+        except Exception as e:
+            print(f"Failed to run {x}: {e}")
+    else:
+        print(f"Could not find the installation path of {x}")
 else:
     print("Results for "+MyText)
     driver=search(MyText)
