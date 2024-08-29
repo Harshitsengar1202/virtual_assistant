@@ -2,6 +2,7 @@ from tkinter import *
 from gtts import gTTS
 from playsound import playsound
 import os
+import subprocess
 import speech_recognition as sr
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
@@ -12,12 +13,10 @@ import wikipedia
 from selenium import webdriver
 import googlesearch
 import tkinter as tk
-#from PIL import Image, ImageTk
+from PIL import Image, ImageTk
 from itertools import count
 import time
-import sys
-print(sys.executable)
-print(sys.path)
+import pyautogui
 
 def SpeakText(command):
     engine = pyttsx3.init()
@@ -28,14 +27,12 @@ def SpeakText(command):
 
 def search(command):
     search_string = command
-    s = Service(ChromeDriverManager().install())
-    try:
-        driver = webdriver.Chrome(service=s)
-        driver.maximize_window()
-        driver.get("https://www.google.com/search?q=" + search_string + "&start=" + str(0))
-        return driver
-    except Exception as e:
-        print(f"An error occurred: {e}")
+    #search_string = search_string.replace(' ', '+')
+    s=Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=s)
+    driver.maximize_window()
+    driver.get("https://www.google.com/search?q=" +search_string + "&start=" + str(0))
+    return driver
     #driver.find_element(By.NAME, 'q').send_keys(search_string)
     '''browser = webdriver.Chrome('D:\\chromedriver.exe')
     for i in range(1):
@@ -120,6 +117,14 @@ def process():
         except sr.UnknownValueError:
             print("unknown error occured")
 
+def find_files(filename, search_path):
+   result = []
+   for root, dir, files in os.walk(search_path):
+      if filename in files:
+         result.append(os.path.join(root, filename))
+   print(result)
+   return result
+
 MyText=None
 mytext='Hello Harshit How can I help you'
 r = sr.Recognizer()
@@ -132,11 +137,15 @@ if 'wikipedia' in MyText:
 elif 'bye' in MyText:
     exit()
 elif 'open' in MyText:
-    SpeakText('Trying to open the file')
+    #SpeakText('Tumhari maa ka bhosda')
     temp=MyText.split()
     x=temp[1]
-    open(x+'.exe')
-    time.sleep(3600)
+    #print("maa chuda")
+    path=find_files(x+'.exe',"E:\\")
+    pyautogui.moveTo(path[0])
+    #os.system("cd"+path[0])
+    #time.sleep(3)
+    #subprocess.Popen(path[0])
 else:
     print("Results for "+MyText)
     driver=search(MyText)
