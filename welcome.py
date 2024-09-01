@@ -67,7 +67,7 @@ mytext='Hello Harshit How can I help you'
 r = sr.Recognizer()
 SpeakText(mytext)
 MyText=process()
-if 'wikipedia' or "tell me about" in MyText:
+if 'wikipedia' in MyText:
     print(MyText)
     wiki(MyText)
 elif 'bye' in MyText:
