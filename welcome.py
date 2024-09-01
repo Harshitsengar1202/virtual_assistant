@@ -33,8 +33,17 @@ def search(command):
     return driver
 
 def wiki(command):
-    print(wikipedia.search(command))
-    result=wikipedia.summary(command)
+    import random
+    random_array=["for","search","on","wikipedia","this"]
+    query=[x for x in command.split() if x not in random_array]
+    try:
+        wiki=wikipedia.page(query,auto_suggest=False)
+    except wikipedia.DisambiguationError as e:
+        s=random.choice(e.options)
+        wiki=wikipedia.page(s,auto_suggest=False)
+
+    result=wikipedia.summary(wiki)
+    print(result)
     result2=wikipedia.summary(command,sentences=2)
     print(result)
     SpeakText(result2)
