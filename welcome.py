@@ -36,15 +36,17 @@ def wiki(command):
     import random
     random_array=["for","search","on","wikipedia","this"]
     query=[x for x in command.split() if x not in random_array]
+    query=" ".join(query)
+    #print(query)
     try:
         wiki=wikipedia.page(query,auto_suggest=False)
     except wikipedia.DisambiguationError as e:
         s=random.choice(e.options)
         wiki=wikipedia.page(s,auto_suggest=False)
 
-    result=wikipedia.summary(wiki)
+    result=wikipedia.summary(wiki,auto_suggest=False, redirect=True)
     print(result)
-    result2=wikipedia.summary(command,sentences=2)
+    result2=wikipedia.summary(wiki,sentences=2,auto_suggest=False, redirect=True)
     print(result)
     SpeakText(result2)
 
@@ -61,6 +63,7 @@ def wiki(command):
     driver.get('https://en.wikipedia.org/wiki/'+ search_string)
     return driver
 '''
+
 
 
 def process():
