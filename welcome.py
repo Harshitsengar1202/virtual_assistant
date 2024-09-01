@@ -47,8 +47,9 @@ def wiki(command):
     result2=wikipedia.summary(command,sentences=2)
     print(result)
     SpeakText(result2)
-'''
 
+    
+'''
 def wiki(command):
     random_array=["for","search","on","wikipedia","this"]
     query=[x for x in command.split() if x not in random_array]
@@ -58,7 +59,9 @@ def wiki(command):
     driver = webdriver.Chrome(service=s)
     driver.maximize_window()
     driver.get('https://en.wikipedia.org/wiki/'+ search_string)
-    return driver'''
+    return driver
+'''
+
 
 def process():
     global MyText
