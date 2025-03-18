@@ -131,6 +131,7 @@ if __name__ == "__main__":
             if len(temp) > 1:
                 app_name = temp[1]
                 open_app(app_name)
+                break
             else:
                 SpeakText("Please tell me which application you want to open.")
         elif 'search' in MyText or 'tell me about' in MyText:
