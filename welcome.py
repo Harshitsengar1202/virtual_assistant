@@ -11,6 +11,8 @@ import os
 import subprocess
 import winapps
 import psutil
+import asyncio  # Import asyncio
+import audio_analyzer
 
 def SpeakText(command):
     """Initializes the text-to-speech engine and speaks the given command."""
@@ -108,6 +110,20 @@ def open_app(name):
         print(f"Could not find the installation path of {name}")
         SpeakText(f"Sorry, I couldn't find {name} on your computer.")
 
+async def identify_song():
+        SpeakText("Please Speak the command. What's the song. or Identify the song.")
+        song_search=process()
+        audio_file = "recorded_audio.wav"
+        audio_analyzer.record_audio(audio_file, duration=3)
+
+        #Run the audio analysis and search asynchronously
+        track_info = await audio_analyzer.process_audio(audio_file)
+
+        if track_info:
+            print(f"Found song in my script: {track_info['title']} by {track_info['subtitle']}")
+        else:
+            print("No song found in my script.")
+
 # Main program loop
 if __name__ == "__main__":
     MyText = None
@@ -122,6 +138,7 @@ if __name__ == "__main__":
         if 'wikipedia' in MyText:
             print(MyText)
             wiki(MyText)
+            break
         elif 'bye' in MyText or 'exit' in MyText or 'quit' in MyText:
             SpeakText("Goodbye!")
             exit()
@@ -134,6 +151,7 @@ if __name__ == "__main__":
                 break
             else:
                 SpeakText("Please tell me which application you want to open.")
+                break
         elif 'search' in MyText or 'tell me about' in MyText or 'what is' in MyText:
             search_term = MyText.replace('search', '', 1).strip()  # remove "search" from the string
             if search_term:
@@ -143,6 +161,9 @@ if __name__ == "__main__":
             else:
                 SpeakText("What do you want me to search for?")
                 break
+        elif 'which song' in MyText or 'what song' in MyText or 'identify this song' in MyText:
+           asyncio.run(identify_song())
+           break   
         else:
             print("Results for " + MyText)
             search(MyText)
