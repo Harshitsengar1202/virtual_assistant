@@ -134,13 +134,16 @@ if __name__ == "__main__":
                 break
             else:
                 SpeakText("Please tell me which application you want to open.")
-        elif 'search' in MyText or 'tell me about' in MyText:
+        elif 'search' in MyText or 'tell me about' in MyText or 'what is' in MyText:
             search_term = MyText.replace('search', '', 1).strip()  # remove "search" from the string
             if search_term:
                 print("Results for " + search_term)
                 search(search_term)
+                break
             else:
                 SpeakText("What do you want me to search for?")
+                break
         else:
             print("Results for " + MyText)
             search(MyText)
+            break
