@@ -3,6 +3,10 @@ import wave
 import librosa
 import numpy as np
 from shazamio import Shazam
+import os
+from pydub import AudioSegment
+from pydub.utils import make_chunks
+import asyncio
 import pyttsx3
 
 def SpeakText(command):
@@ -14,7 +18,7 @@ def SpeakText(command):
     engine.runAndWait()
 
 # Step 1: Record Audio
-def record_audio(filename, duration=5, rate=44100, channels=1):
+def record_audio(filename, duration=10, rate=44100, channels=1):
     """Records audio from the microphone and saves it as a .wav file."""
     chunk = 1024  # Buffer size
     format = pyaudio.paInt16  # 16-bit resolution
@@ -70,19 +74,33 @@ def analyze_audio(filename):
 # Step 3: Search for a Match Using ShazamIO
 async def search_song(filename):
     """Searches for a song match using ShazamIO."""
+
     print("Searching for a match...")
     SpeakText("Searching Shazam...")
     shazam = Shazam()
-    out = await shazam.recognize_song(filename)
-    
-    if "track" in out:
-        track_info = out["track"]
-        print(f"Song Found: {track_info['title']} by {track_info['subtitle']}")
-        SpeakText(f"Song Found: {track_info['title']} by {track_info['subtitle']}")
-        return track_info
-    else:
-        print("No match found.")
-        SpeakText("No song found, Sorry!")
+
+    try:
+        ffmpeg_path = "C:\\Users\\Harshit\\AppData\\Local\\Microsoft\\WinGet\\Links"  # Your actual path
+        os.environ["PATH"] += os.pathsep + ffmpeg_path  # Add to path
+
+        AudioSegment.converter = os.path.join(ffmpeg_path, "ffmpeg.exe")
+        AudioSegment.ffprobe = os.path.join(ffmpeg_path, "ffprobe.exe")
+        
+        out = await shazam.recognize(filename)  # Use 'recognize' instead of 'recognize_song'
+
+        if "track" in out:
+            track_info = out["track"]
+            print(f"Song Found: {track_info['title']} by {track_info['subtitle']}")
+            SpeakText(f"Song Found: {track_info['title']} by {track_info['subtitle']}")
+            return track_info
+        else:
+            print("No match found.")
+            SpeakText("No song found, Sorry!")
+            return None
+
+    except Exception as e:
+        print(f"Error during song recognition: {e}")
+        SpeakText("Sorry, there was an error identifying the song.")
         return None
 
 async def process_audio(audio_file):
@@ -111,4 +129,3 @@ if __name__ == "__main__":
     import asyncio
     SpeakText("Hello! I'll try to figure out which song is playing!")
     main()
-
