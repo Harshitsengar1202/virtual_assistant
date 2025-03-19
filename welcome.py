@@ -111,10 +111,10 @@ def open_app(name):
         SpeakText(f"Sorry, I couldn't find {name} on your computer.")
 
 async def identify_song():
-        SpeakText("Please Speak the command. What's the song. or Identify the song.")
-        song_search=process()
+        #SpeakText("Please Speak the command. What's the song. or Identify the song.")
+        #song_search=process()
         audio_file = "recorded_audio.wav"
-        audio_analyzer.record_audio(audio_file, duration=3)
+        audio_analyzer.record_audio(audio_file, duration=16)
 
         #Run the audio analysis and search asynchronously
         track_info = await audio_analyzer.process_audio(audio_file)

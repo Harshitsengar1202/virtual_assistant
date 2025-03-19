@@ -76,7 +76,7 @@ async def search_song(filename):
     """Searches for a song match using ShazamIO."""
 
     print("Searching for a match...")
-    SpeakText("Searching Shazam...")
+    #SpeakText("Searching Shazam...")
     shazam = Shazam()
 
     try:
@@ -119,7 +119,7 @@ def main():
 
     # Step 1: Record audio and save it as a .wav file
     audio_file = "recorded_audio.wav"
-    record_audio(audio_file, duration=5)
+    record_audio(audio_file, duration=10)
 
     # Process the audio file
     asyncio.run(process_audio(audio_file))
