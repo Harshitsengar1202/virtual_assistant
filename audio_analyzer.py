@@ -85,6 +85,8 @@ async def search_song(filename):
 
         AudioSegment.converter = os.path.join(ffmpeg_path, "ffmpeg.exe")
         AudioSegment.ffprobe = os.path.join(ffmpeg_path, "ffprobe.exe")
+        os.environ["TFLITE_GPU_INFERENCE"] = "0"
+        os.environ["TFLITE_CPU_ONLY"] = "1"
         
         out = await shazam.recognize(filename)  # Use 'recognize' instead of 'recognize_song'
 

@@ -11,8 +11,11 @@ import os
 import subprocess
 import winapps
 import psutil
-import asyncio  # Import asyncio
+import asyncio  
 import audio_analyzer
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
 
 def SpeakText(command):
     """Initializes the text-to-speech engine and speaks the given command."""
@@ -32,6 +35,37 @@ def search(command):
     driver.maximize_window()
     driver.get("https://www.google.com/search?q=" + search_string)
     return driver
+
+def play_song(command):
+    """Searches for a song on YouTube and plays the first video."""
+    search_string = command
+    chrome_options = Options()
+    chrome_options.add_experimental_option("detach", True)  # Keep browser open
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+    
+    # Navigate to YouTube and search for the song
+    driver.get("https://www.youtube.com/results?search_query=" + search_string)
+    
+    try:
+        # Wait for the search results to load and locate the first video
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, '//ytd-video-renderer//a[@id="video-title"]'))
+        )
+        
+        # Click on the first video
+        first_video = driver.find_element(By.XPATH, '//ytd-video-renderer//a[@id="video-title"]')
+        first_video.click()
+        
+        print(f"Playing the song: {search_string}")
+        SpeakText(f"Playing the song: {search_string}")
+        
+    except Exception as e:
+        print(f"Error playing song: {e}")
+        SpeakText("Sorry, I couldn't play the song.")
+    
+    # Note: The browser will remain open due to detach=True
+
 
 def wiki(command):
     """Searches Wikipedia for the given command and speaks a summary."""
@@ -126,6 +160,10 @@ async def identify_song():
 
 # Main program loop
 if __name__ == "__main__":
+    import logging
+    logging.getLogger("selenium").setLevel(logging.ERROR)
+    logging.getLogger("pdh").setLevel(logging.ERROR)
+
     MyText = None
     mytext = "Hello, how can I help you?"
     SpeakText(mytext)
@@ -161,9 +199,19 @@ if __name__ == "__main__":
             else:
                 SpeakText("What do you want me to search for?")
                 break
+        elif 'play' in MyText:
+            search_term = MyText.replace('play', '', 1).strip()  # Remove "play" from the string
+            if search_term:
+                print("Playing the song " + search_term)
+                play_song(search_term)
+                break
+            else:
+                SpeakText("What do you want me to play?")
+                break
+
         elif 'which song' in MyText or 'what song' in MyText or 'identify this song' or 'find this song' in MyText:
            asyncio.run(identify_song())
-           break   
+           break  
         else:
             print("Results for " + MyText)
             search(MyText)
