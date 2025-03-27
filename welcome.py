@@ -152,7 +152,7 @@ if __name__ == "__main__":
             else:
                 SpeakText("Please tell me which application you want to open.")
                 break
-        elif 'search' in MyText or 'tell me about' in MyText or 'what is' in MyText:
+        elif 'search' in MyText or 'tell me ' in MyText or 'what is' in MyText:
             search_term = MyText.replace('search', '', 1).strip()  # remove "search" from the string
             if search_term:
                 print("Results for " + search_term)
@@ -161,7 +161,7 @@ if __name__ == "__main__":
             else:
                 SpeakText("What do you want me to search for?")
                 break
-        elif 'which song' in MyText or 'what song' in MyText or 'identify this song' in MyText:
+        elif 'which song' in MyText or 'what song' in MyText or 'identify this song' or 'find this song' in MyText:
            asyncio.run(identify_song())
            break   
         else:
