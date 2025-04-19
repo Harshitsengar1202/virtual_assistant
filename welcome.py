@@ -15,6 +15,24 @@ import asyncio
 import audio_analyzer
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import subprocess
+
+
+def ask_ollama(prompt):
+    try:
+        process = subprocess.run(
+            ["ollama", "run", "phi"],
+            input=prompt.encode(),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=30
+        )
+        reply = process.stdout.decode().strip()
+        print("Ollama says:", reply)
+        SpeakText(reply)
+    except Exception as e:
+        print(f"Ollama error: {e}")
+        SpeakText("Sorry, I couldn't get a response from the local model.")
 
 
 def SpeakText(command):
@@ -208,11 +226,10 @@ if __name__ == "__main__":
             else:
                 SpeakText("What do you want me to play?")
                 break
-
         elif 'which song' in MyText or 'what song' in MyText or 'identify this song' or 'find this song' in MyText:
            asyncio.run(identify_song())
            break  
         else:
-            print("Results for " + MyText)
-            search(MyText)
-            break
+            print("Asking local AI: " + MyText)
+            ask_ollama(MyText)
+
