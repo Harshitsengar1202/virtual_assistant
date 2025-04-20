@@ -15,7 +15,8 @@ import winapps
 import psutil
 import asyncio
 import audio_analyzer
-import time  # ⏳ for delays after actions
+import time
+import requests
 
 def SpeakText(command):
     engine = pyttsx3.init()
@@ -40,7 +41,6 @@ def play_song(command):
     chrome_options.add_experimental_option("detach", True)
     service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=chrome_options)
-
     driver.get("https://www.youtube.com/results?search_query=" + search_string)
 
     try:
@@ -49,10 +49,8 @@ def play_song(command):
         )
         first_video = driver.find_element(By.XPATH, '//ytd-video-renderer//a[@id="video-title"]')
         first_video.click()
-
         print(f"Playing the song: {search_string}")
         SpeakText(f"Playing the song: {search_string}")
-
     except Exception as e:
         print(f"Error playing song: {e}")
         SpeakText("Sorry, I couldn't play the song.")
@@ -134,25 +132,31 @@ async def identify_song():
         print("No song found.")
         SpeakText("Sorry, I couldn't identify the song.")
 
-def ask_ollama(prompt):
-    try:
-        process = subprocess.run(
-            ["ollama", "run", "phi"],
-            input=prompt.encode(),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            timeout=30
-        )
-        reply = process.stdout.decode().strip()
-        if not reply:
-            reply = "Sorry, I didn't get a response from the local model."
-        print("Ollama says:", reply)
-        SpeakText(reply)
-    except Exception as e:
-        print(f"Ollama error: {e}")
-        SpeakText("Sorry, I couldn't get a response from the local model.")
 
-# Main loop
+def ask_groq(prompt):
+    headers = {
+        "Authorization": "Bearer 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",  
+        "Content-Type": "application/json"
+    }
+
+    data = {
+        "model": "llama3-8b-8192",
+        "messages": [
+            {"role": "user", "content": prompt}
+        ]
+    }
+
+    try:
+        response = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=data)
+        reply = response.json()["choices"][0]["message"]["content"]
+        print("\n Groq says:\n" + reply + "\n")
+
+    except Exception as e:
+        print(f"Groq error: {e}")
+        SpeakText("Sorry, I couldn't get a response from Groq.")
+
+
+
 if __name__ == "__main__":
     import logging
     logging.getLogger("selenium").setLevel(logging.ERROR)
@@ -171,7 +175,7 @@ if __name__ == "__main__":
             time.sleep(3)
             continue
 
-        elif 'bye' in MyText or 'exit' in MyText or 'quit' in MyText:
+        elif 'bye' in MyText or 'exit' in MyText or 'quit' in MyText or 'ok thanks' in MyText:
             SpeakText("Goodbye!")
             exit()
 
@@ -183,7 +187,7 @@ if __name__ == "__main__":
             else:
                 SpeakText("Please tell me which application you want to open.")
             time.sleep(5)
-            break
+            continue
 
         elif 'search' in MyText or 'tell me' in MyText or 'what is' in MyText:
             search_term = MyText.replace('search', '', 1).strip()
@@ -201,7 +205,7 @@ if __name__ == "__main__":
             else:
                 SpeakText("What do you want me to play?")
             time.sleep(5)
-            break
+            continue
 
         elif ('which song' in MyText or
               'what song' in MyText or
@@ -209,9 +213,9 @@ if __name__ == "__main__":
               'find this song' in MyText):
             asyncio.run(identify_song())
             time.sleep(3)
-            break
+            continue
 
         else:
-            ask_ollama(MyText)
+            ask_groq(MyText)
             time.sleep(3)
             continue
