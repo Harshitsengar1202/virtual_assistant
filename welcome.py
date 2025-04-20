@@ -187,7 +187,7 @@ if __name__ == "__main__":
             else:
                 SpeakText("Please tell me which application you want to open.")
             time.sleep(5)
-            continue
+            break
 
         elif 'search' in MyText or 'tell me' in MyText or 'what is' in MyText:
             search_term = MyText.replace('search', '', 1).strip()
@@ -196,8 +196,7 @@ if __name__ == "__main__":
             else:
                 SpeakText("What do you want me to search for?")
             time.sleep(5)
-            continue
-
+            break
         elif 'play' in MyText:
             search_term = MyText.replace('play', '', 1).strip()
             if search_term:
@@ -205,7 +204,7 @@ if __name__ == "__main__":
             else:
                 SpeakText("What do you want me to play?")
             time.sleep(5)
-            continue
+            break
 
         elif ('which song' in MyText or
               'what song' in MyText or
