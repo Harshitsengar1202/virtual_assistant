@@ -39,6 +39,13 @@ def play_song(command):
     search_string = command
     chrome_options = Options()
     chrome_options.add_experimental_option("detach", True)
+    chrome_options.add_argument("user-data-dir=C:\\Temp\\ChromeProfile")  # use a real browser profile
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-extensions")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--start-maximized")
+
     service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.get("https://www.youtube.com/results?search_query=" + search_string)
@@ -54,6 +61,7 @@ def play_song(command):
     except Exception as e:
         print(f"Error playing song: {e}")
         SpeakText("Sorry, I couldn't play the song.")
+
 
 def wiki(command):
     random_array = ["for", "search", "on", "wikipedia", "this"]
