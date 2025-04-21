@@ -203,7 +203,6 @@ if __name__ == "__main__":
                 play_song(search_term)
             else:
                 SpeakText("What do you want me to play?")
-            time.sleep(5)
             break
 
         elif ('which song' in MyText or
